@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect 
 from django.http import HttpResponse, HttpResponseNotFound
 from .models import Women, Category
+from .forms import * 
 
 
 # Create your views here.
@@ -44,7 +45,23 @@ def show_category(request, cat_slug):
 
 
 def addpage(request):
-    return HttpResponse('Добавить статью')
+    
+    title = 'Добавить статью'
+    if request.method == 'POST':
+        form = AddPostForm(request.POST)
+        if form.is_valid():
+            #print(form.cleaned_data)
+            try: 
+                Women.objects.create(**forms.cleaned_data)
+                return redirect('home')
+            except:
+                form.add_error(None, 'Ошибка добавления поста')
+    else:
+        form = AddPostForm()
+    return render(request, 'women/addpage.html', {'form': form,  'title': title})
+
+
+
 def login(request):
     return HttpResponse('login')
 def contact(request):
